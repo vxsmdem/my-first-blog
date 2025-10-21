@@ -17,11 +17,33 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-from blog import views  # импортируем views из blog приложения
+from django.contrib.auth import views as auth_views
+
+# wagtail
+from wagtail import urls as wagtail_urls
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.documents import urls as wagtaildocs_urls
 
 urlpatterns = [
+    # стандартный админ Django
     path('admin/', admin.site.urls),
-    path('', include('blog.urls')),  # Пусть все остальные URL идут из blog.urls
-    path('post/new/', views.post_new, name='post_new'),  # Это можно перенести внутрь blog/urls.py
+
+    # блог
+    path('blog/', include('blog.urls')),
+
+    # авторизация Django (чтобы работали {% url 'login' %} и {% url 'logout' %})
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+
+    # Wagtail админка и документы
+    path('cms/', include(wagtailadmin_urls)),
+    path('documents/', include(wagtaildocs_urls)),
+
+    # Главная страница Wagtail (всё остальное)
+    path('', include(wagtail_urls)),
 ]
+
+
+
+
 
