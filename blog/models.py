@@ -2,14 +2,13 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-# Импорты Wagtail
+# Wagtail imports for pages
 from wagtail.models import Page
 from wagtail.fields import RichTextField
 from wagtail.admin.panels import FieldPanel
 from wagtail.search import index
 
-
-# ----- Обычная Django-модель (как раньше) -----
+# Plain Django Post (kept for legacy tutorial)
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -27,7 +26,6 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-
 class Comment(models.Model):
     post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='comments')
     author = models.CharField(max_length=200)
@@ -40,35 +38,33 @@ class Comment(models.Model):
         self.save()
 
     def __str__(self):
-        return self.text
+        return f"{self.author}: {self.text[:30]}"
 
-
-# ----- Главная страница блога -----
+# Wagtail Home Page
 class HomePage(Page):
     intro = RichTextField(blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel('intro'),
+        FieldPanel('intro')
     ]
 
-
-# ----- Новая модель BlogPage для постов -----
+# Wagtail Blog Page (for Wagtail-managed posts)
 class BlogPage(Page):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateField("Post date")
     intro = models.CharField(max_length=250)
-    text = RichTextField(blank=True)
+    body = RichTextField(blank=True)
 
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
-        index.SearchField('text'),
+        index.SearchField('body'),
     ]
 
     content_panels = Page.content_panels + [
-        FieldPanel('author'),
         FieldPanel('date'),
         FieldPanel('intro'),
-        FieldPanel('text'),
+        FieldPanel('body'),
     ]
+
 
 

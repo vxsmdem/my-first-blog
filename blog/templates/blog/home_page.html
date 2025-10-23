@@ -1,21 +1,18 @@
 {% extends "blog/wagtail_base.html" %}
 {% load wagtailcore_tags %}
-
-{% block body_class %}template-homepage{% endblock %}
-
 {% block content %}
-  <h1>{{ page.title }}</h1>
-  <div class="intro">{{ page.intro|richtext }}</div>
+    <h1>{{ page.title }}</h1>
+    <div class="intro">{{ page.intro|richtext }}</div>
 
-  {% for post in page.get_children %}
-      {% with post=post.specific %}
-      <article class="post mb-4">
-          <time class="text-muted">{{ post.first_published_at|date:"d.m.Y" }}</time>
-          <h2><a href="{% pageurl post %}">{{ post.title }}</a></h2>
-          <div>{{ post.intro|richtext }}</div>
-      </article>
-      {% endwith %}
-  {% endfor %}
+    {% for post in page.get_children %}
+        <article class="post mb-4">
+            <time class="date text-muted">{{ post.first_published_at }}</time>
+            <h2><a href="{% pageurl post %}">{{ post.title }}</a></h2>
+            <div>{{ post.specific.intro }}</div>
+            <div>{{ post.specific.body|richtext }}</div>
+        </article>
+    {% endfor %}
 {% endblock %}
+
 
 
